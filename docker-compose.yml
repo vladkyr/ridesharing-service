@@ -1,18 +1,23 @@
 version: '3.6'
 
 services:
-  #change these commented blocks to add your chosen database images as containers to your project
-
-  # sql:
-  #   image: mysql:latest
-  #   container_name: sql
-  #   restart: always
-  #   environment:
-  #     - MYSQL_USER=user
-  #     - MYSQL_PASSWORD=password
-  #     - MYSQL_ROOT_PASSWORD=password
-  #     - MYSQL_DATABASE=imse_sql_db
-  #     - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+  sql:
+    image: mysql:5.7
+    container_name: sql
+    restart: always
+    environment:
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+      #- MYSQL_DATABASE=imse_sql_db
+      - MYSQL_DATABASE=knights
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    expose:
+      - 3306
+    networks:
+      - database
+    #volumes:
+    #  - mysql-data:/var/lib/mysql
 
   # mongo:
   #   image: mongo
@@ -31,8 +36,11 @@ services:
     container_name: api 
     restart: always
     #EXPOSE defines the ports reachable from INSIDE your docker network
-    expose: 
+    expose:
       - 8000
+    networks:
+      - database
+      - external
 
   frontend:
     build: ./frontend
@@ -40,6 +48,8 @@ services:
     restart: always
     expose:
       - 80
+    networks:
+      - external
 
   nginx:
     build: ./nginx
@@ -49,3 +59,14 @@ services:
     ports: 
       - "8000:8000"
       - "8001:8001"
+    networks:
+      - external
+
+networks:
+  database: {}
+  external: {}
+
+#volumes:
+  #mysql-data:
+   # name: test-mysql-data
+    # name imse-mysql-data
