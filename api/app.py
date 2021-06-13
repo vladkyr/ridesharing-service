@@ -1,34 +1,31 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_cors import CORS
 from flask_restful import Api
 import json
 from flaskext.mysql import MySQL
-#from flask_mysqldb import MySQL
-#from flask_mysql_connector import MySQL
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
-'''
-app.config['MYSQL_USER'] = 'user'
-#app.config['MYSQL_ROOT_PASSWORD'] = 'password'
-app.config['MYSQL_PASSWORD'] = 'password'
-#app.config['MYSQL_HOST'] = '0.0.0.0'
-app.config['MYSQL_DB'] = 'knights'
-#app.config['MYSQL_DB'] = 'imse_sql_db'
-app.config['MYSQL_HOST'] = 'sql'
-'''
+
+# mysql configuration
+app.config['MYSQL_DATABASE_HOST'] = 'sql'
 app.config['MYSQL_DATABASE_USER'] = 'user'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
 app.config['MYSQL_DATABASE_DB'] = 'knights'
-app.config['MYSQL_DATABASE_HOST'] = 'sql'
+#app.config['MYSQL_DATABASE_DB'] = 'imse_sql_db'
 mysql = MySQL(app)
 mysql.init_app(app)
 
 
 @app.route('/', methods=['GET'])
 def default():
-    return {'message': "You are now on the default page"}
+    return redirect(url_for('home'))
+
+
+@app.route('/home', methods=['GET'])
+def home():
+    return {'message': "You are now on the home page"}
 
 
 @app.route('/connect')
@@ -37,53 +34,60 @@ def index():
 
 
 def favorite_colors():
-    #conn = mysql.connection
-    conn = mysql.get_db()
+    conn = mysql.get_db()   # open connection to db
+    warnings = conn.show_warnings()
+    if warnings:
+        print('warnings:', warnings)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM favorite_colors')
-    for (name, color) in cursor:
-        print('name', name)
-    results = [{name: color} for (name, color) in cursor]
+    results = cursor.fetchall()
     cursor.close()
     conn.close()    # close connection
     print('results', results)
     return results
 
 
-@app.route('/home', methods=['GET'])
-def home():
-    return {'message': "You are now on the home page"}
-
-
 @app.route('/initdb', methods=['GET'])
 def initialise_db():
-    f = open('./sql/init.sql', 'r')
-    script = f.read()
-    f.close()
-    #conn = mysql.connection
-    conn = mysql.get_db()
-    cursor = conn.cursor()
-    result = cursor.execute(script)
-    print('initdb result', result)
-    cursor.close()
-    conn.close()  # close connection
+    script = get_script_from_file('./sql/init_db.sql')
+    execute_script(script)
     return {'message': "Initialised mysql database"}
 
 
 @app.route('/filldb', methods=['GET'])
 def fill_db():
-    conn = mysql.get_db()
-    cursor = conn.cursor()
-    f = open('./sql/filldb.sql', 'r')
-    for line in f:
-        cursor.execute(line)
-    f.close()
-    cursor.close()
-    conn.close()  # close connection
+    script = get_script_from_file('./sql/fill_db.sql')
+    execute_script(script)
     return {'message': "Filled mysql database"}
 
 
-@app.route('/bookride', methods=['GET'])
+def get_script_from_file(filename):
+    f = open(filename, 'r')
+    script = f.read()
+    f.close()
+    return script
+
+
+def execute_script(script):
+    conn = mysql.get_db()
+    cursor = conn.cursor()
+
+    if ';' in script:
+        queries = script.split(';')[:-1]  # get separate sql queries which are separated in file with semicolon
+        for line in queries:
+            # print('line', line)
+            cursor.execute(line)
+            conn.commit()
+    else:   # there is only 1 query in file without semicolon
+        cursor.execute(script)
+        conn.commit()
+
+    cursor.close()
+    conn.close()  # close connection
+    return
+
+
+@app.route('/book-ride', methods=['GET'])
 def book_ride():
     return {'message': "You are trying to book a ride"}
 

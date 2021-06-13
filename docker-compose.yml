@@ -16,8 +16,8 @@ services:
       - 3306
     networks:
       - database
-    #volumes:
-    #  - mysql-data:/var/lib/mysql
+    volumes:
+      - mysql-data:/var/lib/mysql
 
   # mongo:
   #   image: mongo
@@ -66,7 +66,7 @@ networks:
   database: {}
   external: {}
 
-#volumes:
-  #mysql-data:
-   # name: test-mysql-data
+volumes:
+  mysql-data:
+    name: test-mysql-data
     # name imse-mysql-data
