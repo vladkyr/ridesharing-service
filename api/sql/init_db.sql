@@ -1,8 +1,8 @@
-DROP TABLE if exists models;
-DROP TABLE if exists vehicles;
-DROP TABLE if exists users;
 DROP TABLE if exists orders;
 DROP TABLE if exists history_orders;
+DROP TABLE if exists users;
+DROP TABLE if exists vehicles;
+DROP TABLE if exists models;
 
 
 CREATE TABLE models (
@@ -17,7 +17,8 @@ CREATE TABLE vehicles (
   model_id int unsigned not null,
   status varchar(20),
   number_plate varchar(20) not null,
-  foreign key (model_id) references models(model_id)
+  foreign key (model_id) references models(model_id),
+  unique (number_plate)
 );
 
 CREATE TABLE users (
@@ -25,7 +26,8 @@ CREATE TABLE users (
   name VARCHAR(30) not null,
   email VARCHAR(40) not null,
   password VARCHAR(40) not null,
-  balance smallint unsigned
+  balance smallint unsigned,
+  unique (email)
 );
 
 CREATE TABLE orders (
@@ -49,7 +51,7 @@ CREATE TABLE history_orders (
   passengers smallint unsigned not null,
   end_time timestamp,
   distance int unsigned not null,
-  trip_time int unsigned not null,
+  trip_time time not null,
   price int unsigned,
   foreign key (user_id) references users(user_id),
   foreign key (vehicle_id) references vehicles(vehicle_id)

@@ -9,8 +9,8 @@ services:
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=password
-      #- MYSQL_DATABASE=imse_sql_db
-      - MYSQL_DATABASE=knights
+      - MYSQL_DATABASE=imse_sql_db
+      #- MYSQL_DATABASE=knights
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
     expose:
       - 3306
@@ -68,5 +68,5 @@ networks:
 
 volumes:
   mysql-data:
-    name: test-mysql-data
-    #name: imse-mysql-data
+    name: imse-mysql-data
+    #name: test-mysql-data

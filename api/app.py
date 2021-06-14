@@ -12,12 +12,13 @@ api = Api(app)
 app.config['MYSQL_DATABASE_HOST'] = 'sql'
 app.config['MYSQL_DATABASE_USER'] = 'user'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
-app.config['MYSQL_DATABASE_DB'] = 'knights'
-#app.config['MYSQL_DATABASE_DB'] = 'imse_sql_db'
+#app.config['MYSQL_DATABASE_DB'] = 'knights'
+app.config['MYSQL_DATABASE_DB'] = 'imse_sql_db'
+
 mysql = MySQL(app)
 mysql.init_app(app)
 
-'''
+
 init_db_file = './sql/init_db.sql'
 fill_db_file = './sql/fill_db.sql'
 report_file = './sql/report.sql'
@@ -25,7 +26,7 @@ report_file = './sql/report.sql'
 init_db_file = './sql/init_test.sql'
 fill_db_file = './sql/fill_test.sql'
 report_file = './sql/report_test.sql'
-
+'''
 
 
 @app.route('/', methods=['GET'])
@@ -100,7 +101,7 @@ def get_report(script):
     results = cursor.fetchall()
     cursor.close()
     conn.close()
-    print('report results:', results)
+    # print('report results:', results)
     return results
 
 
