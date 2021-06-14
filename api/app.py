@@ -17,6 +17,16 @@ app.config['MYSQL_DATABASE_DB'] = 'knights'
 mysql = MySQL(app)
 mysql.init_app(app)
 
+'''
+init_db_file = './sql/init_db.sql'
+fill_db_file = './sql/fill_db.sql'
+report_file = './sql/report.sql'
+'''
+init_db_file = './sql/init_test.sql'
+fill_db_file = './sql/fill_test.sql'
+report_file = './sql/report_test.sql'
+
+
 
 @app.route('/', methods=['GET'])
 def default():
@@ -28,37 +38,31 @@ def home():
     return {'message': "You are now on the home page"}
 
 
-@app.route('/connect')
-def index():
-    return json.dumps({'favorite_colors': favorite_colors()})
-
-
-def favorite_colors():
-    conn = mysql.get_db()   # open connection to db
-    warnings = conn.show_warnings()
-    if warnings:
-        print('warnings:', warnings)
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM favorite_colors')
-    results = cursor.fetchall()
-    cursor.close()
-    conn.close()    # close connection
-    print('results', results)
-    return results
-
-
-@app.route('/initdb', methods=['GET'])
+@app.route('/init-db', methods=['GET'])
 def initialise_db():
-    script = get_script_from_file('./sql/init_db.sql')
+    script = get_script_from_file(init_db_file)
     execute_script(script)
     return {'message': "Initialised mysql database"}
 
 
-@app.route('/filldb', methods=['GET'])
+@app.route('/fill-db', methods=['GET'])
 def fill_db():
-    script = get_script_from_file('./sql/fill_db.sql')
+    script = get_script_from_file(fill_db_file)
     execute_script(script)
     return {'message': "Filled mysql database"}
+
+
+# book-ride is a main use case
+@app.route('/book-ride', methods=['GET'])
+def book_ride():
+    return {'message': "You are trying to book a ride, but this service is not implemented yet"}
+
+
+@app.route('/report')
+def report():
+    script = get_script_from_file(report_file)
+    results = get_report(script)
+    return json.dumps({'report results': results})
 
 
 def get_script_from_file(filename):
@@ -70,6 +74,7 @@ def get_script_from_file(filename):
 
 def execute_script(script):
     conn = mysql.get_db()
+    get_warnings(conn)
     cursor = conn.cursor()
 
     if ';' in script:
@@ -87,9 +92,22 @@ def execute_script(script):
     return
 
 
-@app.route('/book-ride', methods=['GET'])
-def book_ride():
-    return {'message': "You are trying to book a ride"}
+def get_report(script):
+    conn = mysql.get_db()
+    get_warnings(conn)
+    cursor = conn.cursor()
+    cursor.execute(script)
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    print('report results:', results)
+    return results
+
+
+def get_warnings(connection):
+    warnings = connection.show_warnings()
+    if warnings:
+        print('warnings:', warnings)
 
 
 if __name__ == '__main__':
