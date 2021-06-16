@@ -3,11 +3,12 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-3">
-            <img src="./assets/car_logo.png">
             <Menu/>
         </div>
-        <div class="col-md-8">
-            <HelloWorld msg="Hello world"/>
+        <div class="col-md-9">
+            <v-main transition="slide-x-transition">
+                <router-view></router-view>
+            </v-main>
         </div>
       </div>
     </div>
@@ -15,13 +16,11 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 import Menu from './components/Menu.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
     Menu
   }
 }
