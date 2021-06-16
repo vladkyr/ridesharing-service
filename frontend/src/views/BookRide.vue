@@ -1,5 +1,55 @@
 <template>
     <div class="rows">
+        <b-container fluid>
+            <label class="input-header">Please fill in the fields to book a ride:</label>
+            <b-row class="input">
+                <b-col sm="3">
+                    <label>email:</label>
+                </b-col>
+                <b-col sm="4">
+                    <b-form-input v-model="email" :type="email"></b-form-input>
+                </b-col>
+            </b-row>
+            <b-row class="input">
+                <b-col sm="3">
+                    <label>password:</label>
+                </b-col>
+                <b-col sm="4">
+                    <b-form-input v-model="password" :type="password"></b-form-input>
+                </b-col>
+            </b-row>
+            <b-row class="input">
+                <b-col sm="3">
+                    <label>start location:</label>
+                </b-col>
+                <b-col sm="4">
+                    <b-form-input v-model="start"></b-form-input>
+                </b-col>
+            </b-row>
+            <b-row class="input">
+                <b-col sm="3">
+                    <label>destination:</label>
+                </b-col>
+                <b-col sm="4">
+                    <b-form-input v-model="dest"></b-form-input>
+                </b-col>
+            </b-row>
+            <b-row class="input">
+                <b-col sm="3">
+                    <label>passengers:</label>
+                </b-col>
+                <b-col sm="4">
+                    <b-form-input v-model="passengers" :type="number"></b-form-input>
+                </b-col>
+            </b-row>
+        </b-container>
+        <div>
+            <div class="mt-2">email      : {{ email }}</div>
+            <div class="mt-2">password   : {{ password }}</div>
+            <div class="mt-2">start loc  : {{ start }}</div>
+            <div class="mt-2">destination: {{ dest }}</div>
+            <div class="mt-2">passengers : {{ passengers }}</div>
+        </div>
         <div class="menu-row">
             <button class="button" @click="bookRide">book ride</button>
         </div>
@@ -22,14 +72,12 @@ export default {
     bookRide() {
         console.log("clicked book ride button")
         this.error_bool = false
-        axios.get('http://localhost:8000/book-ride')
-        axios({
-          method: 'post',
-          url: 'http://localhost:8000/book-ride',
-          data: {
-            firstName: 'Fred',
-            lastName: 'Flintstone'
-          }
+        axios.post('http://localhost:8000/book-ride', {
+            email: this.email,
+            password: this.password,
+            start: this.start,
+            dest: this.dest,
+            passengers: this.passengers
         })
         .then((response) => {
             this.payload = response.data

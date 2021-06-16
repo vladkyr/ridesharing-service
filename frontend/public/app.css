@@ -30,7 +30,6 @@ h1 {
 .menu p {
     margin-top: 50px;
 }
-img {
-    margin-bottom: 20px;
-    align-self: flex-start;
+.input-header {
+    align-self: revert;
 }

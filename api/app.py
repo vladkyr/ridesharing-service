@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, request
 from flask_cors import CORS
 from flask_restful import Api
 import json
@@ -47,9 +47,50 @@ def fill_db():
 
 
 # book-ride is a main use case
-@app.route('/book-ride', methods=['GET'])
+@app.route('/book-ride', methods=['GET', 'POST'])
 def book_ride():
-    return {'message': "You are trying to book a ride, but this service is not implemented yet"}
+    if request.method == 'POST':
+        data = request.get_json()
+        return {'message': create_order(data)}
+    else:
+        return {'message': "You are trying to book a ride via GET"}
+
+
+def create_order(data):
+    email = data['email']
+    password = data['password']
+    start = data['start']
+    dest = data['dest']
+    passengers = data['passengers']
+    user_id = get_user(email, password)
+    if user_id is None:   # no user in DB with such email and password
+        return 'No user found in DB. Please check your email and password'
+    else:
+        # get_vehicle
+        user_id = user_id[0]
+        order_query = """
+            INSERT INTO orders (user_id, start_loc, destination, status, passengers)
+            VALUES ({}, '{}', '{}', '{}', {});""".format(user_id, start, dest, 'new', passengers)
+        execute_script(order_query)
+        get_orders = 'SELECT * FROM orders'
+        return 'Created new order, current orders:\n' + json.dumps(get_report(get_orders))
+
+
+def get_user(email, password):
+    get_user_query = """
+    SELECT user_id
+    FROM users
+    WHERE email LIKE '{}'
+    AND password LIKE '{}';""".format(email, password)
+
+    conn = mysql.connect()
+    get_warnings(conn)
+    cursor = conn.cursor()
+    cursor.execute(get_user_query)
+    results = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return results
 
 
 @app.route('/report', methods=['GET'])
@@ -83,7 +124,7 @@ def get_script_from_file(filename):
 
 
 def execute_script(script):
-    conn = mysql.get_db()
+    conn = mysql.connect()
     get_warnings(conn)
     cursor = conn.cursor()
 
@@ -102,7 +143,7 @@ def execute_script(script):
 
 
 def get_report(script):
-    conn = mysql.get_db()
+    conn = mysql.connect()
     get_warnings(conn)
     cursor = conn.cursor()
     cursor.execute(script)
