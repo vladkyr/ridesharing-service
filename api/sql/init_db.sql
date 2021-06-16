@@ -42,6 +42,7 @@ CREATE TABLE orders (
   foreign key (vehicle_id) references vehicles(vehicle_id)
 );
 
+-- trip_time is in minutes
 CREATE TABLE history_orders (
   order_id int unsigned not null primary key,
   user_id int unsigned not null,
@@ -51,7 +52,7 @@ CREATE TABLE history_orders (
   passengers smallint unsigned not null,
   end_time timestamp,
   distance int unsigned not null,
-  trip_time time not null,
+  trip_time smallint not null,
   price int unsigned,
   foreign key (user_id) references users(user_id),
   foreign key (vehicle_id) references vehicles(vehicle_id)

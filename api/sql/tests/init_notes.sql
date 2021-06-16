@@ -1,3 +1,21 @@
+
+
+
+-- fill history_orders
+INSERT INTO history_orders (order_id, user_id, vehicle_id, start_loc, destination, passengers, end_time, distance, trip_time, price)
+VALUES (123, 1, 3, 'loc1', 'dest1', 1, '2021-06-14 11:00:00', 10, '0:30:00', 30),
+       (234, 2, 2, 'loc2', 'dest2', 2, '2021-06-14 12:00:00', 7, '0:20:00', 20),
+       (345, 3, 1, 'loc3', 'dest3', 3, '2021-06-14 13:00:00', 5, '0:10:00', 10);
+
+
+
+
+
+
+
+
+
+
 -- fill models
 INSERT INTO models (manufacturer, model, capacity)
 VALUES ('Tesla', 'Model 3', 5),
