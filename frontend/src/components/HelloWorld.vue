@@ -20,7 +20,7 @@ export default {
       handleButtonClick() {
         console.log("clicked button")
         this.error_bool = false
-        axios.get('http://localhost:8000/helloworld')
+        axios.get('http://localhost:8000/home')
         .then((response) => {
             this.payload = response.data
             console.log(response.data)

@@ -1,16 +1,28 @@
 <template>
   <div id="app">
-    <HelloWorld msg="IMSE Test WebApp"/>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3">
+            <img src="./assets/car_logo.png">
+            <Menu/>
+        </div>
+        <div class="col-md-8">
+            <HelloWorld msg="Hello world"/>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
+import Menu from './components/Menu.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    HelloWorld,
+    Menu
   }
 }
 </script>
@@ -21,6 +33,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  align-items: center;
   color: #2c3e50;
   margin-top: 60px;
 }

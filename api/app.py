@@ -52,7 +52,7 @@ def book_ride():
     return {'message': "You are trying to book a ride, but this service is not implemented yet"}
 
 
-@app.route('/report')
+@app.route('/report', methods=['GET'])
 def report():
     script = get_script_from_file(report_file)
     results = get_report(script)
@@ -66,14 +66,13 @@ def report():
             'capacity': result[2],
             'trips': result[3],
             'avg_trip_time': int(result[4]),
-            #'avg_passengers': "%.1f" % float(result[5])    # returns str
             'avg_passengers': round(float(result[5]), 1)
         }
         results_list.append(result)
     templated = {'report results': results_list}
     json_results = json.dumps(templated, indent=4)
     print(json_results)
-    return json_results
+    return {'message': json_results}
 
 
 def get_script_from_file(filename):

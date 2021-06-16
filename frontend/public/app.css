@@ -1,0 +1,36 @@
+body {
+    font-family: Futura, serif;
+    text-align: center;
+}
+h1 {
+    color: black;
+    text-align: center;
+}
+.menu-row {
+    align-items: center;
+}
+.button {
+    background-color: #2d6b32;
+    border: 1px solid green;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    color: white;
+    width: 200px;
+    padding: 13px 32px;
+    text-align: center;
+    font-size: 20px;
+}
+.button:hover {
+  background-color: #47994b;
+}
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.menu p {
+    margin-top: 50px;
+}
+img {
+    margin-bottom: 20px;
+    align-self: flex-start;
+}

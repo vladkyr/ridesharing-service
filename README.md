@@ -23,15 +23,15 @@ docker compose down
 ```
 localhost:8000/home
 ```
-2. to initialise mysql database, go to:
+2. initialise mysql database:
 ```
-localhost:8000/initdb
+localhost:8000/init-db
 ```
-1. to fill mysql database, go to:
+3. fill mysql database:
 ```
-localhost:8000/filldb
+localhost:8000/fill-db
 ```
-1. to get some data from database, go to:
+4. get report:
 ```
-localhost:8000/connect
+localhost:8000/report
 ```
