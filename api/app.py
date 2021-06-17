@@ -73,10 +73,11 @@ def report():
             'avg_passengers': round(float(result[5]), 1)
         }
         results_list.append(result)
-    templated = {'report results': results_list}
-    json_results = json.dumps(templated, indent=4)
-    print(json_results)
-    return {'message': json_results}
+    # templated = {'report results': results_list}
+    #json_results = json.dumps(templated)
+    #print(json_results)
+    return {'message': 'successfully produced report', 'report_results': results_list}
+    # return json_results
 
 
 def create_order(data):
