@@ -29,8 +29,9 @@ class SqlHelper:
                             VALUES ({}, {}, '{}', '{}', '{}', {});
                             """.format(user_id, vehicle_id, start, dest, 'new', passengers)
             self.execute_script(order_query)
-            get_orders = 'SELECT * FROM orders'
-            return 'Created new order\nCurrent orders:\n' + json.dumps(get_report(self.mysql, get_orders), indent=4)
+            # get_orders = 'SELECT * FROM orders'
+            # return 'Created new order\nCurrent orders:\n' + json.dumps(get_report(self.mysql, get_orders), indent=4)
+            return 'Created new order for user ' + str(user_id)
 
     def get_user_id(self, email, password):
         get_user_query = """
@@ -93,3 +94,5 @@ class SqlHelper:
                 'avg_passengers': round(float(result[5]), 1)
             }
             results_list.append(result)
+
+        return results_list

@@ -8,12 +8,18 @@ class MigrationHelper:
         self.mongo_db = mongo_db
 
     def migrate_data(self):
+        self.clear_collections()
         self.migrate_vehicle_data()
         self.migrate_user_data()
         # mongo_vehicle_data = self.migrate_vehicle_data()
         # mongo_user_data = self.migrate_user_data()
         # return {'mongo_vehicle_data': mongo_vehicle_data, 'mongo_user_data': mongo_user_data}
         return {'message': "Data successfully migrated from Mysql to Mongo"}
+
+    def clear_collections(self):
+        # delete all documents from collections
+        self.mongo_db.users.remove({})
+        self.mongo_db.vehicles.remove({})
 
     def migrate_vehicle_data(self):
         vehicles = self.get_vehicle_data()

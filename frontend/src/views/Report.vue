@@ -1,5 +1,6 @@
 <template>
     <div class="report-menu">
+        <p>database: {{ database }}</p>
         <div class="menu-row">
             <button class="button" @click="getReport">get report</button>
         </div>
