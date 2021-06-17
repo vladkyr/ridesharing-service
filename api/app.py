@@ -21,7 +21,6 @@ app.config['MYSQL_DATABASE_DB'] = 'imse_sql_db'
 
 mysql = MySQL(app)
 sql_help = SqlHelper(mysql)
-mgr_help = MigrationHelper(mysql)
 
 init_db_file = './sql/init_db.sql'
 fill_db_file = './sql/fill_db.sql'
@@ -33,6 +32,8 @@ app.config["MONGO_URI"] = "mongodb://user:password@mongo:27017/imse_mongo_db?aut
 mongo = PyMongo(app)
 mongo_db = mongo.db
 mng_help = MongoHelper(mongo_db)
+
+mgr_help = MigrationHelper(mysql, mongo_db)
 
 
 @app.route('/', methods=['GET'])
@@ -82,7 +83,7 @@ def mongo():
     return {'orders': orders}
 
 
-@app.route('/migration', methods=['GET'])
+@app.route('/migrate', methods=['GET'])
 def migrate():
     return mgr_help.migrate_data()
 
