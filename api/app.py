@@ -79,7 +79,6 @@ def report():
 @app.route('/mongo', methods=['GET'])
 def mongo():
     orders = mng_help.mongo_test()
-    # return {'message': json.dumps([order for order in orders])}
     return {'orders': orders}
 
 
@@ -88,9 +87,13 @@ def migrate():
     return mgr_help.migrate_data()
 
 
-@app.route('/mongo/book-ride', methods=['GET'])
+@app.route('/mongo/book-ride', methods=['GET', 'POST'])
 def mongo_book_ride():
-    return {'message': "You are trying book a ride by creating order in mongo DB"}
+    if request.method == 'POST':
+        data = request.get_json()
+        return {'message': mng_help.create_order(data)}
+    else:
+        return {'message': "You are trying to book a ride in MongoDB via GET"}
 
 
 @app.route('/mongo/report', methods=['GET'])

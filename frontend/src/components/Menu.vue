@@ -4,12 +4,12 @@
         <b-nav-item active to="/">Home</b-nav-item>
         <h5 class="menu-section">Mysql:</h5>
         <b-nav-item active to="/init-db">Init DB</b-nav-item>
-        <b-nav-item active to="/book-ride">Book ride</b-nav-item>
-        <b-nav-item active to="/report">Report</b-nav-item>
-        <b-nav-item active to="/">Migrate data</b-nav-item>
+        <b-nav-item active to="/book-ride?database=mysql">Book ride</b-nav-item>
+        <b-nav-item active to="/report?database=mysql">Report</b-nav-item>
+        <b-nav-item active to="/migrate">Migrate</b-nav-item>
         <h5 class="menu-section">Nosql:</h5>
-        <b-nav-item active to="/">Book ride</b-nav-item>
-        <b-nav-item active to="/">Report</b-nav-item>
+        <b-nav-item active to="/book-ride?database=mongo">Book ride</b-nav-item>
+        <b-nav-item active to="/report?database=mongo">Report</b-nav-item>
     </b-nav>
     <p>{{payload.message}}</p>
     <p v-if="error_bool">{{helper}}</p>

@@ -12,7 +12,7 @@ class SqlHelper:
         start = data['start']
         dest = data['dest']
         passengers = data['passengers']
-        user_id = self.get_user(email, password)
+        user_id = self.get_user_id(email, password)
         if user_id is None:  # no user in DB with such email and password
             return 'No user found in DB. Please check your email and password'
         else:
@@ -32,7 +32,7 @@ class SqlHelper:
             get_orders = 'SELECT * FROM orders'
             return 'Created new order\nCurrent orders:\n' + json.dumps(get_report(self.mysql, get_orders), indent=4)
 
-    def get_user(self, email, password):
+    def get_user_id(self, email, password):
         get_user_query = """
             SELECT user_id
             FROM users

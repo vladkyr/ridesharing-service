@@ -18,8 +18,8 @@ class MigrationHelper:
     def migrate_vehicle_data(self):
         vehicles = self.get_vehicle_data()
         self.mongo_db.vehicles.insert_many(vehicles)
-        mongo_vehicles = [result for result in self.mongo_db.vehicles.find()]
-        print('vehicles from Mongo DB:', mongo_vehicles)
+        # mongo_vehicles = [result for result in self.mongo_db.vehicles.find()]
+        # print('vehicles from Mongo DB:', mongo_vehicles)
         # return mongo_vehicles
         return
 
@@ -32,8 +32,8 @@ class MigrationHelper:
             user['orders'] = user_orders
 
         self.mongo_db.users.insert_many(users)
-        mongo_users = [result for result in self.mongo_db.users.find()]
-        print('users from Mongo DB:', mongo_users)
+        # mongo_users = [result for result in self.mongo_db.users.find()]
+        # print('users from Mongo DB:', mongo_users)
         # return mongo_users
         return
 

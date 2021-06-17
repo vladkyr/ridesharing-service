@@ -35,6 +35,9 @@ h1 {
 .init-db-menu p {
     margin-top: 50px;
 }
+.migrate-menu p {
+    margin-top: 50px;
+}
 #book-ride-button {
     margin-right: 220px;
     margin-top: 20px;

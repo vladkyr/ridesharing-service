@@ -17,12 +17,19 @@ const routes = [
     {
         path: "/book-ride",
         name: "bookRide",
-        component: () => import("../views/BookRide.vue")
+        component: () => import("../views/BookRide.vue"),
+        props: (route) => ({ database: route.query.database })
     },
     {
         path: "/report",
         name: "report",
-        component: () => import("../views/Report.vue")
+        component: () => import("../views/Report.vue"),
+        props: (route) => ({ database: route.query.database })
+    },
+    {
+        path: "/migrate",
+        name: "migrate",
+        component: () => import("../views/Migrate.vue")
     }
 ];
 

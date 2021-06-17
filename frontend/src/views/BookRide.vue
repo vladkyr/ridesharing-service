@@ -1,6 +1,7 @@
 <template>
     <div class="book-ride-menu">
         <b-container fluid>
+            <p>database: {{ database }}</p>
             <label class="input-header">Please fill in the fields to book a ride:</label>
             <b-row class="input">
                 <b-col sm="3">
@@ -59,13 +60,19 @@ import axios from 'axios'
 export default {
   name: 'BookRide',
   props: {
-    msg: String
+    msg: String,
+    database: String
   },
   methods: {
     bookRide() {
         console.log("clicked book ride button")
         this.error_bool = false
-        axios.post('http://localhost:8000/book-ride', {
+        if (this.database === 'mysql') {
+            this.url = 'http://localhost:8000/book-ride'
+        } else {
+            this.url = 'http://localhost:8000/mongo/book-ride'
+        }
+        axios.post(this.url, {
             email: this.email,
             password: this.password,
             start: this.start,
@@ -90,7 +97,8 @@ export default {
         payload: [],
         helper: "",
         error_msg: "",
-        error_bool: null
+        error_bool: null,
+        url: ""
     }
   }
 }
