@@ -1,3 +1,3 @@
 <template>
-    <p>home</p>
+    <img src="../assets/car_logo.png">
 </template>

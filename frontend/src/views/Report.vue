@@ -7,10 +7,6 @@
             <b-table striped hover :items="items" :fields="fields"></b-table>
         </div>
         <p>{{payload.message}}</p>
-        <p>items:</p>
-        <div class="items">
-            {{ items }}
-        </div>
         <p v-if="error_bool">{{helper}}</p>
         <p v-if="error_bool">{{error_msg}}</p>
     </div>

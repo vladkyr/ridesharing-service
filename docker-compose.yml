@@ -18,15 +18,19 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
 
-  # mongo:
-  #   image: mongo
-  #   container_name: mongo
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: user
-  #     MONGO_INITDB_ROOT_PASSWORD: password
-  #     MONGO_INITDB_DATABASE: imse_mongo_db
-  #   ports:
-  #     - "27017:27017"
+  mongo:
+    image: mongo
+    container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=imse_mongo_db
+    expose:
+      - 27017
+    networks:
+      - database
+    #volumes:
+    #  - mongo-data:/var/lib/mongo
 
   api:
     #this tells docker where to look for the Dockerfile to build the image
@@ -68,3 +72,6 @@ networks:
 volumes:
   mysql-data:
     name: imse-mysql-data
+
+  # mongo-data
+  #  name: imse-mongo-data

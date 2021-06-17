@@ -1,8 +1,10 @@
-from flask import Flask, redirect, url_for, request
+from flask import Flask, redirect, url_for, request, jsonify
 from flask_cors import CORS
 from flask_restful import Api
 import json
 from flaskext.mysql import MySQL
+from flask_pymongo import PyMongo
+from pymongo import MongoClient
 
 app = Flask(__name__)
 CORS(app)
@@ -15,11 +17,30 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
 app.config['MYSQL_DATABASE_DB'] = 'imse_sql_db'
 
 mysql = MySQL(app)
-mysql.init_app(app)
+# mysql.init_app(app)
 
 init_db_file = './sql/init_db.sql'
 fill_db_file = './sql/fill_db.sql'
 report_file = './sql/report.sql'
+
+
+# mongo configuration
+app.config["MONGO_URI"] = "mongodb://user:password@mongo:27017/imse_mongo_db?authSource=admin"
+'''app.config['MONGO_HOST'] = 'localhost'
+app.config['MONGO_PORT'] = '27017'
+app.config['MONGO_DBNAME'] = 'imse_mongo_db'
+app.config['MONGO_USERNAME'] = 'user'
+app.config['MONGO_PASSWORD'] = 'password'
+app.config['MONGO_AUTH_SOURCE'] = 'admin'
+'''
+
+mongo = PyMongo(app)
+# mongo.init_app(app)
+mongo_db = mongo.db
+
+# uri = 'mongodb://user:password@mongo:27017/imse_mongo_db'
+# mongo = MongoClient(uri)
+# mongo_db = mongo.get_database()
 
 
 @app.route('/', methods=['GET'])
@@ -73,11 +94,79 @@ def report():
             'avg_passengers': round(float(result[5]), 1)
         }
         results_list.append(result)
-    # templated = {'report results': results_list}
-    #json_results = json.dumps(templated)
-    #print(json_results)
-    return {'message': 'successfully produced report', 'report_results': results_list}
-    # return json_results
+    return {'report_results': results_list}
+    # return {'message': 'successfully produced report', 'report_results': results_list}
+
+
+@app.route('/mongo', methods=['GET'])
+def mongo():
+    print('mongo_db', mongo_db)
+    print('mongo_db.orders.find()', [result for result in mongo_db.orders.find()])
+    mongo_db.orders.insert_one({
+        '_id': 12345,
+        'user': 'userX',
+        'start': 'start1',
+        'dest': 'dest1'
+    })
+    orders = [result for result in mongo_db.orders.find()]
+    print('orders', orders)
+    # return {'message': json.dumps([order for order in orders])}
+    return {'orders': orders}
+
+
+@app.route('/migrate-data', methods=['GET'])
+def migrate_data():
+    vehicles = get_vehicle_data()
+    users = get_user_data()
+    return {'vehicle_data': vehicles, 'user_data': users}
+    # return {'message': "You are now on the migrate-data page"}
+
+
+def get_user_orders(user_id):
+    user_orders = '''
+        SELECT order_id, vehicle_id, start_loc, destination, status, passengers
+        FROM orders
+        WHERE user_id = {}; 
+    '''.format(user_id)
+    orders = get_report(user_orders)
+    user_history = '''
+        SELECT order_id, vehicle_id, start_loc, destination, passengers, end_time, distance, trip_time, price
+        FROM history_orders
+        WHERE user_id = {}; 
+    '''.format(user_id)
+    hist_orders = get_report(user_history)
+    print('orders type', type(orders))
+    print('hist_orders type', type(hist_orders))
+    return orders, hist_orders
+
+
+def get_user_data():
+    user_data = '''
+        SELECT user_id, name, email, password, balance
+        FROM users; 
+    '''
+    users = get_report(user_data)
+    return users
+
+
+def get_vehicle_data():
+    vehicle_data = '''
+        SELECT vehicle_id, manufacturer, model, capacity, status, number_plate
+        FROM vehicles
+        JOIN models ON vehicles.model_id = models.model_id; 
+    '''
+    vehicles = get_report(vehicle_data)
+    return vehicles
+
+
+@app.route('/mongo-book-ride', methods=['GET'])
+def mongo_book_ride():
+    return {'message': "You are trying book a ride by creating order in mongo DB"}
+
+
+@app.route('/mongo-report', methods=['GET'])
+def get_mongo_report():
+    return {'message': "You are trying to get mongo-report"}
 
 
 def create_order(data):

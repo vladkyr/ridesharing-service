@@ -23,9 +23,6 @@ h1 {
 .button:hover {
   background-color: #47994b;
 }
-.menu p {
-    margin-top: 50px;
-}
 .input-header {
     margin-right: 220px;
 }
@@ -46,4 +43,7 @@ h1 {
     margin-top: 20px;
     padding-right: 30px;
     padding-left: 30px;
+}
+.menu-section {
+    margin-top: 10px;
 }

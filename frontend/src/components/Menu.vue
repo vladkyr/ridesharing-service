@@ -2,9 +2,14 @@
   <div class="menu">
     <b-nav vertical>
         <b-nav-item active to="/">Home</b-nav-item>
+        <h5 class="menu-section">Mysql:</h5>
         <b-nav-item active to="/init-db">Init DB</b-nav-item>
         <b-nav-item active to="/book-ride">Book ride</b-nav-item>
         <b-nav-item active to="/report">Report</b-nav-item>
+        <b-nav-item active to="/">Migrate data</b-nav-item>
+        <h5 class="menu-section">Nosql:</h5>
+        <b-nav-item active to="/">Book ride</b-nav-item>
+        <b-nav-item active to="/">Report</b-nav-item>
     </b-nav>
     <p>{{payload.message}}</p>
     <p v-if="error_bool">{{helper}}</p>
@@ -13,39 +18,12 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   name: 'Menu',
   props: {
     msg: String
   },
-  methods: {
-    bookRide() {
-        console.log("clicked book ride button")
-        this.error_bool = false
-        axios.get('http://localhost:8000/book-ride')
-        axios({
-          method: 'post',
-          url: 'http://localhost:8000/book-ride',
-          data: {
-            firstName: 'Fred',
-            lastName: 'Flintstone'
-          }
-        })
-        .then((response) => {
-            this.payload = response.data
-            console.log(response.data)
-            this.clicked = "clicked"
-      })
-      .catch(error => {
-          this.payload = {'message': "book ride button -> something went wrong! Your Api isn't running properly."}
-          this.error_bool = true
-          this.helper = "right click -> Inspect -> Console. Check the console error message after button click"
-          this.error_msg = error
-      })
-    }
-  },
+  methods: {},
   data(){
     return{
         payload: [],
@@ -58,4 +36,8 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style scoped>
+b-nav-item {
+    font-size: 18px;
+}
+</style>
