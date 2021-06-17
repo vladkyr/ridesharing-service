@@ -1,5 +1,5 @@
 <template>
-    <div class="rows">
+    <div class="book-ride-menu">
         <b-container fluid>
             <label class="input-header">Please fill in the fields to book a ride:</label>
             <b-row class="input">
@@ -43,15 +43,8 @@
                 </b-col>
             </b-row>
         </b-container>
-        <div>
-            <div class="mt-2">email      : {{ email }}</div>
-            <div class="mt-2">password   : {{ password }}</div>
-            <div class="mt-2">start loc  : {{ start }}</div>
-            <div class="mt-2">destination: {{ dest }}</div>
-            <div class="mt-2">passengers : {{ passengers }}</div>
-        </div>
         <div class="menu-row">
-            <button class="button" @click="bookRide">book ride</button>
+            <button class="button" id="book-ride-button" @click="bookRide">book ride</button>
         </div>
         <p>{{payload.message}}</p>
         <p v-if="error_bool">{{helper}}</p>

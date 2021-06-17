@@ -1,5 +1,5 @@
 <template>
-    <div class="rows">
+    <div class="init-db-menu">
         <div class="menu-row">
             <button class="button" @click="initDatabase">initialise DB</button>
         </div>

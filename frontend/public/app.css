@@ -23,13 +23,22 @@ h1 {
 .button:hover {
   background-color: #47994b;
 }
-.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 .menu p {
     margin-top: 50px;
 }
 .input-header {
-    align-self: revert;
+    margin-right: 220px;
+}
+.input {
+    margin-bottom: 10px;
+}
+.input label{
+    margin-top: 10px;
+}
+.init-db-menu p {
+    margin-top: 50px;
+}
+#book-ride-button {
+    margin-right: 220px;
+    margin-top: 20px;
 }

@@ -15,7 +15,7 @@ INSERT INTO users (name, email, password, balance)
 VALUES ('user1', 'user1@email.com', 'password1', 100),
        ('user2', 'user2@email.com', 'password2', 50),
        ('user3', 'user3@email.com', 'password3', 225),
-       ('user4', 'em4', 'password4', 25);
+       ('user4', 'em4', 'pass4', 25);
 
 -- fill orders
 INSERT INTO orders (user_id, vehicle_id, start_loc, destination, status, passengers)

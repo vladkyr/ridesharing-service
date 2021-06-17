@@ -56,43 +56,6 @@ def book_ride():
         return {'message': "You are trying to book a ride via GET"}
 
 
-def create_order(data):
-    email = data['email']
-    password = data['password']
-    start = data['start']
-    dest = data['dest']
-    passengers = data['passengers']
-    user_id = get_user(email, password)
-    if user_id is None:   # no user in DB with such email and password
-        return 'No user found in DB. Please check your email and password'
-    else:
-        # get_vehicle
-        user_id = user_id[0]
-        order_query = """
-            INSERT INTO orders (user_id, start_loc, destination, status, passengers)
-            VALUES ({}, '{}', '{}', '{}', {});""".format(user_id, start, dest, 'new', passengers)
-        execute_script(order_query)
-        get_orders = 'SELECT * FROM orders'
-        return 'Created new order, current orders:\n' + json.dumps(get_report(get_orders))
-
-
-def get_user(email, password):
-    get_user_query = """
-    SELECT user_id
-    FROM users
-    WHERE email LIKE '{}'
-    AND password LIKE '{}';""".format(email, password)
-
-    conn = mysql.connect()
-    get_warnings(conn)
-    cursor = conn.cursor()
-    cursor.execute(get_user_query)
-    results = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return results
-
-
 @app.route('/report', methods=['GET'])
 def report():
     script = get_script_from_file(report_file)
@@ -114,6 +77,62 @@ def report():
     json_results = json.dumps(templated, indent=4)
     print(json_results)
     return {'message': json_results}
+
+
+def create_order(data):
+    email = data['email']
+    password = data['password']
+    start = data['start']
+    dest = data['dest']
+    passengers = data['passengers']
+    user_id = get_user(email, password)
+    if user_id is None:   # no user in DB with such email and password
+        return 'No user found in DB. Please check your email and password'
+    else:
+        vehicle_id = get_vehicle(passengers)
+        user_id = user_id[0]
+        if vehicle_id is None:  # no vehicle in DB available with enough capacity
+            order_query = """
+                INSERT INTO orders (user_id, start_loc, destination, status, passengers)
+                VALUES ({}, '{}', '{}', '{}', {});""".format(user_id, start, dest, 'new, no vehicle', passengers)
+        else:
+            vehicle_id = vehicle_id[0]
+            order_query = """
+                        INSERT INTO orders (user_id, vehicle_id, start_loc, destination, status, passengers)
+                        VALUES ({}, {}, '{}', '{}', '{}', {});""".format(user_id, vehicle_id, start, dest, 'new', passengers)
+        execute_script(order_query)
+        get_orders = 'SELECT * FROM orders'
+        return 'Created new order\nCurrent orders:\n' + json.dumps(get_report(get_orders), indent=4)
+
+
+def get_user(email, password):
+    get_user_query = """
+        SELECT user_id
+        FROM users
+        WHERE email LIKE '{}'
+        AND password LIKE '{}';""".format(email, password)
+    return execute_and_fetchone(get_user_query)
+
+
+def get_vehicle(passengers):
+    get_vehicle_query = """
+        SELECT vehicles.vehicle_id
+        FROM vehicles
+        JOIN models ON models.model_id = vehicles.model_id
+        WHERE models.capacity >= {}
+        AND vehicles.status LIKE 'available';""".format(passengers)
+    return execute_and_fetchone(get_vehicle_query)
+
+
+def execute_and_fetchone(query):
+    conn = mysql.connect()
+    get_warnings(conn)
+    cursor = conn.cursor()
+    cursor.execute(query)
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result
 
 
 def get_script_from_file(filename):

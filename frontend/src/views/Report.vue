@@ -1,5 +1,5 @@
 <template>
-    <div class="rows">
+    <div class="report-menu">
         <div class="menu-row">
             <button class="button" @click="getReport">get report</button>
         </div>
