@@ -14,6 +14,7 @@
     <p>{{payload.message}}</p>
     <p v-if="error_bool">{{helper}}</p>
     <p v-if="error_bool">{{error_msg}}</p>
+    <p class="copyright">&copy; Vladyslav Kyryk</p>
   </div>
 </template>
 
@@ -39,5 +40,8 @@ export default {
 <style scoped>
 b-nav-item {
     font-size: 18px;
+}
+.copyright {
+    margin-top: 200px;
 }
 </style>

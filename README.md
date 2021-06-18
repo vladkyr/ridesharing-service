@@ -35,3 +35,7 @@ localhost:8000/fill-db
 ```
 localhost:8000/report
 ```
+5. get mongo report:
+```
+localhost:8000/mongo/report
+```

@@ -1,0 +1,353 @@
+in report should only be orders with status completed
+
+
+# vehicle_id , trips_number
+# manufacturer, model, capacity , trips_number
+# manufacturer, model, capacity , trips_number, sorted by trips_number decreasing
+# manufacturer, model, capacity , trips_number, avg_trip_time
+# manufacturer, model, capacity , trips_number, avg_trip_time, avg_passengers
+# manufacturer, model, capacity , trips_number, avg_trip_time, avg_passengers, filtered by date (last year)
+
+
+
+----------------------------------------------------------------------------------------------------------------
+
+        get_orders_per_user = {
+            '$project': {
+                'user_orders': {
+                    '$map': {
+                        'input': '$orders',
+                        'as': 'order',
+                        'in': {
+                            'vehicle_id': '$$order.vehicle_id',
+                            'trip_time': '$$order.trip_time',
+                            'status': '$$order.status',
+                            'passengers': '$$order.passengers',
+                            'end_time': '$$order.end_time'
+                        }
+                    }
+                }
+            }
+        }
+
+        group_orders_into_list_of_lists = {
+            '$group': {
+                '_id': None,
+                'all_orders_as_lists': {
+                    '$push': '$user_orders'
+                }
+            }
+        }
+
+        reduce_list_of_lists_into_list_of_orders = {
+            '$project': {
+                '_id': None,
+                'all_orders': {
+                    '$reduce': {
+                        'input': '$all_orders_as_lists',
+                        'initialValue': [],
+                        'in': {
+                            '$concatArrays': ["$$value", "$$this"]
+                        }
+                    }
+                }
+            }
+        }
+
+        filter_uncompleted_orders = {
+            '$project': {
+                'completed_user_orders': {
+                    '$filter': {
+                        'input': '$all_orders',
+                        'as': 'order',
+                        'cond': {'$eq': ['completed', '$$order.status']}
+                    }
+                }
+            }
+        }
+
+        convert_vehicle_ids_to_models = {
+            '$project': {
+                '$map': {
+                    'input': '$all_orders',
+                    'as': 'order',
+                    'in': {
+                        '_id': None,
+                        'vehicle_id': '$$order.vehicle_id',
+                        'trip_time': '$$order.trip_time',
+                        'status': '$$order.status',
+                        'passengers': '$$order.passengers',
+                        'end_time': '$$order.end_time'
+                    }
+                }
+            }
+        }
+
+        # get orders per user
+        results = self.mongo_db.users.aggregate([
+            get_orders_per_user
+        ])
+        print('\n\nresults 1:')
+        [print(result) for result in results]
+        print('\n\n')
+
+        # get all orders as list of lists
+        results = self.mongo_db.users.aggregate([
+            get_orders_per_user,
+            group_orders_into_list_of_lists
+        ])
+        print('\n\nresults 2:')
+        [print(result) for result in results]
+        print('\n\n')
+
+        # get all orders as list of orders
+        results = self.mongo_db.users.aggregate([
+            get_orders_per_user,
+            group_orders_into_list_of_lists,
+            reduce_list_of_lists_into_list_of_orders
+        ])
+        print('\n\nresults 3:')
+        [print(result) for result in results]
+        print('\n\n')
+
+        # get completed orders as list of orders
+        results = self.mongo_db.users.aggregate([
+            get_orders_per_user,
+            group_orders_into_list_of_lists,
+            reduce_list_of_lists_into_list_of_orders,
+            filter_uncompleted_orders
+        ])
+        print('\n\nresults 4:')
+        [print(result) for result in results]
+        print('\n\n')
+
+        # get completed orders as list of orders
+        results = self.mongo_db.users.aggregate([
+            get_orders_per_user,
+            group_orders_into_list_of_lists,
+            reduce_list_of_lists_into_list_of_orders,
+            filter_uncompleted_orders,
+            {
+                '$project': {
+                    '_id': None,
+                    'all_orders': {
+                        '$map': {
+                            'input': '$all_orders',
+                            'as': 'order',
+                            'in': {
+                                '_id': None,
+                                'manufacturer': '$model.manufacturer',
+                                'model': '$model.model',
+                                'capacity': '$model.capacity',
+                                'trip_time': '$$order.trip_time',
+                                'status': '$$order.status',
+                                'passengers': '$$order.passengers',
+                                'end_time': '$$order.end_time'
+                            }
+                        }
+                    }
+                }
+            }
+        ])
+        print('\n\nresults 5:')
+        [print(result) for result in results]
+        print('\n\n')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                },
+
+
+        select_orders_with_status_completed = {
+            '$project': {
+                '_id': None,
+                'all_completed_orders': {
+                    '$map': {
+                        'input': '$all_orders',
+                        'as': 'order',
+                        'in': {
+                            '$cond': {
+                                'if': {
+                                    '$eq': ['completed', '$$order.status']},
+                                'then': '$$order',
+                                'else': "$$REMOVE"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        reduce_list_of_lists_into_list_of_orders = {
+            '$project': {
+                '_id': None,
+                'all_orders': {
+                    '$reduce': {
+                        'input': '$all_orders_as_lists',
+                        'initialValue': [],
+                        'in': {
+                            '$concatArrays': ["$$value", "$$this"]
+                        }
+                    }
+                }
+            }
+        }
+
+        get_orders_per_user = {
+            '$project': {
+                'user_orders': {
+                    '$map': {
+                        'input': '$orders',
+                        'as': 'order',
+                        'in': {
+                            '$cond': {
+                                'if': {
+                                    '$eq': ['completed', '$$order.status']},
+                                'then': {
+                                    'vehicle_id': '$$order.vehicle_id',
+                                    'trip_time': '$$order.trip_time',
+                                    'status': '$$order.status',
+                                    'passengers': '$$order.passengers',
+                                    'end_time': '$$order.end_time'
+                                },
+                                'else': '$$REMOVE'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        group_orders_into_list_of_lists = {
+            '$group': {
+                '_id': None,
+                'all_orders_as_lists': {
+                    '$push': {
+                        '$map': {
+                            'input': '$user_orders',
+                            'as': 'order',
+                            'in': {
+                                '$cond': {
+                                    'if': {
+                                        '$eq': ['None', '$user_orders']},
+                                    'then': '$$REMOVE',
+                                    'else': '$user_orders'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        get_orders_per_user = {
+            '$project': {
+                'user_orders': {
+                    '$map': {
+                        'input': '$orders',
+                        'as': 'order',
+                        'in': {
+                            'order': {
+                                '$cond': {
+                                    'if': {
+                                        '$eq': ['completed', '$$order.status']},
+                                    'then': {
+                                        'vehicle_id': '$$order.vehicle_id',
+                                        'trip_time': '$$order.trip_time',
+                                        'status': '$$order.status',
+                                        'passengers': '$$order.passengers',
+                                        'end_time': '$$order.end_time'
+                                    },
+                                    'else': '$$REMOVE'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        # get orders per user
+        results = self.mongo_db.users.aggregate([
+            get_orders_per_user
+        ])
+        print('\n\nresults 1:')
+        [print(result) for result in results]
+        print('\n\n')
+
+        # get all orders as list of lists
+        results = self.mongo_db.users.aggregate([
+            get_orders_per_user,
+            group_orders_into_list_of_lists
+        ])
+        print('\n\nresults 2:')
+        [print(result) for result in results]
+        print('\n\n')
+
+
+
+
+
+
+
+        # get orders per each user
+        results = self.mongo_db.users.aggregate([
+            {
+                '$project': {
+                    'vehicle_ids': {
+                        '$map': {
+                            'input': '$orders',
+                            'as': 'order',
+                            'in': {
+                                'vehicle_id': '$$order.vehicle_id'
+                            }
+                        }
+                    }
+                }
+            }
+        ])
+        print('\n\nresults 1:')
+        [print(result) for result in results]
+        print('\n\n')
+
+
+        results = self.mongo_db.vehicles.aggregate([
+            {
+                '$sort': {
+                    'capacity': ASCENDING
+                }
+            }
+        ])
+        print('\n\nresults 3:', [result for result in results], '\n\n')
+
+
+        results = self.mongo_db.vehicles.aggregate([
+            {
+                '$match': {
+                    '_id': 1
+                }
+            }
+        ])
+        print('\n\nresults 2:', [result for result in results], '\n\n')

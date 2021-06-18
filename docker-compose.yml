@@ -29,8 +29,8 @@ services:
       - 27017
     networks:
       - database
-    #volumes:
-    #  - mongo-data:/var/lib/mongo
+    volumes:
+      - mongo-data:/var/lib/mongo
 
   api:
     #this tells docker where to look for the Dockerfile to build the image
@@ -72,6 +72,5 @@ networks:
 volumes:
   mysql-data:
     name: imse-mysql-data
-
-  # mongo-data
-  #  name: imse-mongo-data
+  mongo-data:
+    name: imse-mongo-data

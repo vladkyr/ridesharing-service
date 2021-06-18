@@ -1,7 +1,7 @@
 <template>
     <div class="migrate-menu">
         <div class="menu-row">
-            <button class="button" @click="migrateToMongo">Migrate to Mongo DB</button>
+            <button class="button" @click="migrateToMongo">migrate to Mongo DB</button>
         </div>
         <p>{{payload.message}}</p>
         <p v-if="error_bool">{{helper}}</p>

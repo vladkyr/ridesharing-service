@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, request
+from flask import Flask, request
 from flask_cors import CORS
 from flask_restful import Api
 from flaskext.mysql import MySQL
@@ -36,16 +36,6 @@ mng_help = MongoHelper(mongo_db)
 mgr_help = MigrationHelper(mysql, mongo_db)
 
 
-@app.route('/', methods=['GET'])
-def default():
-    return redirect(url_for('home'))
-
-
-@app.route('/home', methods=['GET'])
-def home():
-    return {'message': "You are now on the home page"}
-
-
 @app.route('/init-db', methods=['GET'])
 def initialise_db():
     script = get_script_from_file(init_db_file)
@@ -76,12 +66,6 @@ def report():
     return {'report_results': results}
 
 
-@app.route('/mongo', methods=['GET'])
-def mongo():
-    orders = mng_help.mongo_test()
-    return {'orders': orders}
-
-
 @app.route('/migrate', methods=['GET'])
 def migrate():
     return mgr_help.migrate_data()
@@ -97,8 +81,20 @@ def mongo_book_ride():
 
 
 @app.route('/mongo/report', methods=['GET'])
-def get_mongo_report():
-    return {'message': "You are trying to get mongo-report"}
+def mongo_report():
+    results = mng_help.get_most_popular_models()
+    return {'report_results': results}
+
+
+@app.route('/', methods=['GET'])
+def home():
+    return {'message': "You are now on the home page"}
+
+
+@app.route('/mongo', methods=['GET'])
+def mongo():
+    orders = mng_help.mongo_test()
+    return {'orders': orders}
 
 
 if __name__ == '__main__':

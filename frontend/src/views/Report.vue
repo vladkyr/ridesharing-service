@@ -20,13 +20,19 @@ import axios from 'axios'
 export default {
   name: 'GetReport',
   props: {
-    msg: String
+    msg: String,
+    database: String
   },
   methods: {
     getReport() {
-        console.log("clicked report button")
+        console.log("clicked get report button")
         this.error_bool = false
-        axios.get('http://localhost:8000/report')
+        if (this.database === 'mysql') {
+            this.url = 'http://localhost:8000/report'
+        } else {
+            this.url = 'http://localhost:8000/mongo/report'
+        }
+        axios.get(this.url)
         .then((response) => {
             this.payload = response.data
             this.items = response.data.report_results

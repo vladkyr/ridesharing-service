@@ -77,6 +77,7 @@ class MigrationHelper:
 
         hist_orders_with_keys = []
         for result in hist_orders:
+            # convert end_time from datetime to str
             result = {
                 'order_id': result[0],
                 'vehicle_id': result[1],
@@ -84,7 +85,7 @@ class MigrationHelper:
                 'destination': result[3],
                 'status': 'completed',
                 'passengers': result[4],
-                'end_time': result[5],
+                'end_time': result[5].strftime('%Y-%m-%d %H:%M:%S'),
                 'distance': result[6],
                 'trip_time': result[7],
                 'price': result[8]
