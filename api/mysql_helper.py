@@ -12,12 +12,15 @@ class SqlHelper:
         start = data['start']
         dest = data['dest']
         passengers = data['passengers']
-        if not isinstance(passengers, int):
-            return 'Incorrect number of passengers. Please type integer in field "passengers"'
         user_id = self.get_user_id(email, password)
         if user_id is None:  # no user in DB with such email and password
             return 'No user found in DB. Please check your email and password'
         else:
+            try:
+                passengers = int(passengers)
+            except ValueError:
+                return 'Incorrect number of passengers. Please type integer in field "passengers"'
+
             vehicle_id = self.get_vehicle(passengers)
             user_id = user_id[0]
             if vehicle_id is None:  # no vehicle in DB available with enough capacity
@@ -31,9 +34,9 @@ class SqlHelper:
                             VALUES ({}, {}, '{}', '{}', '{}', {});
                             """.format(user_id, vehicle_id, start, dest, 'new', passengers)
             self.execute_script(order_query)
-            # get_orders = 'SELECT * FROM orders'
-            # return 'Created new order\nCurrent orders:\n' + json.dumps(get_report(self.mysql, get_orders), indent=4)
-            return 'Created new order for user ' + str(user_id)
+            get_orders = 'SELECT * FROM orders WHERE user_id LIKE {};'.format(user_id)
+            user_orders = json.dumps(get_report(self.mysql, get_orders))
+            return 'Created new order for user ' + str(user_id) + ', orders of that user: ' + user_orders
 
     def get_user_id(self, email, password):
         get_user_query = """
@@ -86,7 +89,7 @@ class SqlHelper:
 
         results_list = []
         for result in results:
-            # avg_trip_time, avg_passengers should be converted to int/str/float) because Decimal is not JSON serializable
+            # avg_trip_time,avg_passengers should be converted to int/str/float because Decimal is not JSON serializable
             result = {
                 'manufacturer': result[0],
                 'model': result[1],

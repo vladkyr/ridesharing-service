@@ -11,9 +11,6 @@ class MigrationHelper:
         self.clear_collections()
         self.migrate_vehicle_data()
         self.migrate_user_data()
-        # mongo_vehicle_data = self.migrate_vehicle_data()
-        # mongo_user_data = self.migrate_user_data()
-        # return {'mongo_vehicle_data': mongo_vehicle_data, 'mongo_user_data': mongo_user_data}
         return {'message': "Data successfully migrated from Mysql to Mongo"}
 
     def clear_collections(self):
@@ -26,13 +23,12 @@ class MigrationHelper:
         self.mongo_db.vehicles.insert_many(vehicles)
         # mongo_vehicles = [result for result in self.mongo_db.vehicles.find()]
         # print('vehicles from Mongo DB:', mongo_vehicles)
-        # return mongo_vehicles
         return
 
     def migrate_user_data(self):
         users = self.get_user_data()
         users = json.dumps(users)  # convert to str
-        users = json.loads(users)  # convert to json
+        users = json.loads(users)  # convert to dict
         for user in users:
             user_orders = self.get_user_orders(user['_id'])
             user['orders'] = user_orders
@@ -40,7 +36,6 @@ class MigrationHelper:
         self.mongo_db.users.insert_many(users)
         # mongo_users = [result for result in self.mongo_db.users.find()]
         # print('users from Mongo DB:', mongo_users)
-        # return mongo_users
         return
 
     def get_user_orders(self, user_id):

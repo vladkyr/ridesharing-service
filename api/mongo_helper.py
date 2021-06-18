@@ -17,15 +17,17 @@ class MongoHelper:
         email = data['email']
         password = data['password']
         passengers = data['passengers']
-        if not isinstance(passengers, int):
-            return 'Incorrect number of passengers. Please type integer in field "passengers"'
 
         user_id = self.get_user_id(email, password)
-        # print('user_id of user who wants to create order:', user_id)
 
         if user_id is None:  # no user in DB with such email and password
             return 'No user found in DB. Please check your email and password'
         else:
+            try:
+                passengers = int(passengers)
+            except ValueError:
+                return 'Incorrect number of passengers. Please type integer in field "passengers"'
+
             user_id = user_id['_id']
             vehicle_id = self.get_vehicle(passengers)
 
@@ -34,41 +36,32 @@ class MongoHelper:
 
             if vehicle_id is None:  # no vehicle in DB available with enough capacity
                 new_order['status'] = 'new, no vehicle'
-                # self.mongo_db.users.update_one({'_id': user_id}, {'$addToSet': {'orders': new_order}})
                 self.mongo_db.users.update_one({'_id': user_id}, {'$push': {'orders': new_order}})
             else:
                 new_order['vehicle_id'] = vehicle_id
                 print('new_order', new_order)
-                # self.mongo_db.users.update_one({'_id': user_id}, {'$addToSet': {'orders': new_order}})
                 self.mongo_db.users.update_one({'_id': user_id}, {'$push': {'orders': new_order}})
 
             mongo_user = self.mongo_db.users.find_one({'_id': user_id})
             print('user from Mongo DB after new order creation:', mongo_user)
 
-        return 'Created new order in Mongo DB for user' + str(user_id)
-        # return 'Created new order in Mongo DB for user' + str(user_id) + ': ' + str(mongo_user)
+        return 'Created new order in Mongo DB for user' + str(user_id) + ', orders of that user: ' + str(mongo_user)
 
     def get_user_id(self, email, password):
-        # mongo_users = [result for result in self.mongo_db.users.find()]
-        # print('users from Mongo DB:', mongo_users)
         user_id = self.mongo_db.users.find_one({'email': email, 'password': password}, {'_id': 1})
         return user_id
 
     def get_vehicle(self, passengers):
-        vehicle_id = self.mongo_db.vehicles.find_one({'capacity': {'$gte': passengers}, 'status': 'available'},
-                                                     {'_id': 1})
-        print('found vehicle: ', vehicle_id)
+        vehicle_id = self.mongo_db.vehicles.find_one(
+            {
+                'capacity': {'$gte': passengers},
+                'status': 'available'
+            },
+            {
+                '_id': 1
+            })
 
-        vehicles = self.mongo_db.vehicles.find()
-        print('all vehicles', [vehicle for vehicle in vehicles])
-        vehicles = self.mongo_db.vehicles.find({'capacity': {'$gte': passengers}})
-        print('all vehicles with capacity > passengers', [vehicle for vehicle in vehicles])
-        vehicles = self.mongo_db.vehicles.find({'status': 'available'})
-        print('all vehicles status available', [vehicle for vehicle in vehicles])
-        vehicles = self.mongo_db.vehicles.find({'capacity': {'$gte': passengers}, 'status': 'available'})
-        print('all vehicles with capacity > passengers and status available', [vehicle for vehicle in vehicles])
-
-        return vehicle_id
+        return vehicle_id['_id']
 
     def get_most_popular_models(self):
         results = self.mongo_db.users.aggregate([
@@ -127,16 +120,9 @@ class MongoHelper:
                 }
             }
         ])
-        '''print('\n\nresults x6:')
-        for result in results:
-            print(result)
-        print('\n\n')'''
-
-        # print('results', results)
 
         results_list = []
         for result in results:
-            # print('result:', result)
             result = {
                 'manufacturer': result['manufacturer'],
                 'model': result['model'],
