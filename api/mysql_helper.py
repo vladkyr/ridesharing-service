@@ -12,6 +12,8 @@ class SqlHelper:
         start = data['start']
         dest = data['dest']
         passengers = data['passengers']
+        if not isinstance(passengers, int):
+            return 'Incorrect number of passengers. Please type integer in field "passengers"'
         user_id = self.get_user_id(email, password)
         if user_id is None:  # no user in DB with such email and password
             return 'No user found in DB. Please check your email and password'

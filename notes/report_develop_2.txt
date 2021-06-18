@@ -1,0 +1,396 @@
+        results = self.mongo_db.vehicles.find()
+        print('\n\nvehicles:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.find()
+        print('\n\nusers:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            {
+                '$unwind': '$orders'
+            }
+        ])
+        print('\n\nresults x:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            {
+                '$unwind': '$orders'
+            },
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            }
+        ])
+        print('\n\nresults x2:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            {
+                '$unwind': '$orders'
+            },
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            },
+            {
+                '$project': {
+                    'manufacturer': {'$first': '$model.manufacturer'},
+                    'model': {'$first': '$model.model'},
+                    'capacity': {'$first': '$model.capacity'},
+                    'vehicle_id': '$orders.vehicle_id',
+                    'trip_time': '$orders.trip_time',
+                    'status': '$orders.status',
+                    'passengers': '$orders.passengers',
+                    'end_time': {'$toDate': '$orders.end_time'},
+                    'curr_datetime': '$$NOW',
+                    'curr_datetime_minus_year': {'$subtract': ['$$NOW', (365 * 24 * 60 * 60 * 1000)]}
+                }
+            }
+        ])
+        print('\n\nresults x3:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            {
+                '$unwind': '$orders'
+            },
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            },
+            {
+                '$project': {
+                    'manufacturer': {'$first': '$model.manufacturer'},
+                    'model': {'$first': '$model.model'},
+                    'capacity': {'$first': '$model.capacity'},
+                    'vehicle_id': '$orders.vehicle_id',
+                    'trip_time': '$orders.trip_time',
+                    'status': '$orders.status',
+                    'passengers': '$orders.passengers',
+                    'end_time': {'$toDate': '$orders.end_time'}
+                }
+            },
+            {
+                '$match': {
+                    'status': 'completed'
+                }
+            }
+        ])
+        print('\n\nresults x4:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            {
+                '$unwind': '$orders'
+            },
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            },
+            {
+                '$project': {
+                    'manufacturer': {'$first': '$model.manufacturer'},
+                    'model': {'$first': '$model.model'},
+                    'capacity': {'$first': '$model.capacity'},
+                    'vehicle_id': '$orders.vehicle_id',
+                    'trip_time': '$orders.trip_time',
+                    'status': '$orders.status',
+                    'passengers': '$orders.passengers',
+                    'end_time': {'$toDate': '$orders.end_time'},
+                    'curr_datetime': '$$NOW',
+                    'curr_datetime_minus_year': {'$toDate': {'$subtract': ['$$NOW', (365 * 24 * 60 * 60 * 1000)]}}
+                }
+            },
+            {
+                '$match': {
+                    'status': 'completed',
+                    'end_time': {'$gte': {'$toDate': {'$subtract': ['$$NOW', (365 * 24 * 60 * 60 * 1000)]}}}
+                }
+            }
+        ])
+        print('\n\nresults x4.2:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            # get list of all orders
+            {
+                '$unwind': '$orders'
+            },
+            # get respective model data for each vehicle in order
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            },
+            # select necessary data from each order
+            {
+                '$project': {
+                    'manufacturer': {'$first': '$model.manufacturer'},
+                    'model': {'$first': '$model.model'},
+                    'capacity': {'$first': '$model.capacity'},
+                    'vehicle_id': '$orders.vehicle_id',
+                    'trip_time': '$orders.trip_time',
+                    'status': '$orders.status',
+                    'passengers': '$orders.passengers',
+                    'end_time': '$orders.end_time'
+                }
+            },
+            # select only completed orders
+            {
+                '$match': {
+                    'status': 'completed'
+                }
+            },
+            # group orders by vehicle model and compute several values
+            {
+                '$group': {
+                    '_id': {'$concat': ['$manufacturer', '-', '$model', '-', {'$toString': '$capacity'}]},
+                    'manufacturer': {'$first': '$manufacturer'},
+                    'model': {'$first': '$model'},
+                    'capacity': {'$first': '$capacity'},
+                    'trips_number': {'$sum': 1},
+                    'avg_trip_time': {'$avg': '$trip_time'},
+                    'avg_passengers': {'$avg': '$passengers'}
+                }
+            },
+            # sort results by number od trips (decreasing)
+            {
+                '$sort': {
+                    'trips_number': DESCENDING
+                }
+            }
+        ])
+        print('\n\nresults x5:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            {
+                '$unwind': '$orders'
+            },
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            },
+            {
+                '$project': {
+                    'manufacturer': {'$first': '$model.manufacturer'},
+                    'model': {'$first': '$model.model'},
+                    'capacity': {'$first': '$model.capacity'},
+                    'vehicle_id': '$orders.vehicle_id',
+                    'trip_time': '$orders.trip_time',
+                    'status': '$orders.status',
+                    'passengers': '$orders.passengers',
+                    'end_t': '$orders.end_time',
+                    'end_time': {
+                        '$dateFromString': {
+                            'dateString': '$orders.end_time',
+                            'format': '%Y-%m-%d %H:%M:%S'
+
+                        }
+                    },
+                    'curr_datetime': '$$NOW',
+                    'curr_datetime_minus_year': {'$subtract': ['$$NOW', (365 * 24 * 60 * 60 * 1000)]},
+                    'curr_datetime_minus_end_time': {'$subtract': ['$$NOW', {'$toDate': '$orders.end_time'}]},
+                    'gte_end_curr': {'$gte': ['end_time', {'$subtract': ['$$NOW', (365 * 24 * 60 * 60 * 1000)]}]},
+                    'gte_curr_end': {'$gte': [{'$subtract': ['$$NOW', (365 * 24 * 60 * 60 * 1000)]}, 'end_time']}
+                }
+            }
+        ])
+        print('\n\nresults x3:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            {
+                '$unwind': '$orders'
+            },
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            },
+            {
+                '$project': {
+                    'manufacturer': {'$first': '$model.manufacturer'},
+                    'model': {'$first': '$model.model'},
+                    'capacity': {'$first': '$model.capacity'},
+                    'vehicle_id': '$orders.vehicle_id',
+                    'trip_time': '$orders.trip_time',
+                    'status': '$orders.status',
+                    'passengers': '$orders.passengers',
+                    'end_time': {'$toDate': '$orders.end_time'},
+                    'end_t': '$orders.end_time',
+                    'end_time2': {
+                        '$dateFromString': {
+                            'dateString': '$orders.end_time',
+                            'format': '%Y-%m-%d %H:%M:%S'
+
+                        }
+                    },
+                    'curr_datetime': '$$NOW',
+                    'curr_datetime_minus_year': {'$toDate': {'$subtract': ['$$NOW', (365 * 24 * 60 * 60 * 1000)]}},
+                    'curr_datetime_minus_end_time': {'$subtract': ['$$NOW', {'$toDate': '$orders.end_time'}]},
+                    'one_year': (365 * 24 * 60 * 60 * 1000),
+                    'gte_a1': {'$gte': [{'$subtract': ['$$NOW', {'$toDate': '$orders.end_time'}]}, (365 * 24 * 60 * 60 * 1000)]},
+                    'lte_a1': {'$lte': [{'$subtract': ['$$NOW', {'$toDate': '$orders.end_time'}]}, (365 * 24 * 60 * 60 * 1000)]}
+                }
+            },
+            {
+                '$match': {
+                    'status': 'completed'
+                }
+            }
+        ])
+        print('\n\nresults x4.1:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            {
+                '$unwind': '$orders'
+            },
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            },
+            {
+                '$project': {
+                    'manufacturer': {'$first': '$model.manufacturer'},
+                    'model': {'$first': '$model.model'},
+                    'capacity': {'$first': '$model.capacity'},
+                    'vehicle_id': '$orders.vehicle_id',
+                    'trip_time': '$orders.trip_time',
+                    'status': '$orders.status',
+                    'passengers': '$orders.passengers',
+                    'end_time': {'$toDate': '$orders.end_time'},
+                    'curr_datetime': '$$NOW',
+                    'curr_datetime_minus_year': {'$toDate': {'$subtract': ['$$NOW', (365 * 24 * 60 * 60 * 1000)]}},
+                    'curr_datetime_minus_end_time': {'$subtract': ['$$NOW', {'$toDate': '$orders.end_time'}]},
+                    'one_year': (365 * 24 * 60 * 60 * 1000),
+                    'now_minus_order_end_time_lte_one_year': {'$lte': [{'$subtract': ['$$NOW', {'$toDate': '$orders.end_time'}]}, (365 * 24 * 60 * 60 * 1000)]}
+                }
+            },
+            {
+                '$match': {
+                    'status': 'completed',
+                    'now_minus_order_end_time_lte_one_year': True
+                }
+            }
+        ])
+        print('\n\nresults x4.2:')
+        for result in results:
+            print(result)
+        print('\n\n')
+
+        results = self.mongo_db.users.aggregate([
+            # get list of all orders
+            {
+                '$unwind': '$orders'
+            },
+            # get respective model data for each vehicle in order
+            {
+                '$lookup': {
+                    'from': 'vehicles',
+                    'localField': 'orders.vehicle_id',
+                    'foreignField': '_id',
+                    'as': 'model'
+                }
+            },
+            # select necessary data from each order
+            {
+                '$project': {
+                    'manufacturer': {'$first': '$model.manufacturer'},
+                    'model': {'$first': '$model.model'},
+                    'capacity': {'$first': '$model.capacity'},
+                    'vehicle_id': '$orders.vehicle_id',
+                    'trip_time': '$orders.trip_time',
+                    'status': '$orders.status',
+                    'passengers': '$orders.passengers',
+                    'end_time': {'$toDate': '$orders.end_time'},
+                    'now_minus_order_end_time_lte_one_year': {
+                        '$lte': [{'$subtract': ['$$NOW', {'$toDate': '$orders.end_time'}]}, (365 * 24 * 60 * 60 * 1000)]
+                    }
+                }
+            },
+            # select only completed orders and those which are within last year
+            {
+                '$match': {
+                    'status': 'completed',
+                    'now_minus_order_end_time_lte_one_year': True
+                }
+            },
+            # group orders by vehicle model and compute several values
+            {
+                '$group': {
+                    '_id': {'$concat': ['$manufacturer', '-', '$model', '-', {'$toString': '$capacity'}]},
+                    'manufacturer': {'$first': '$manufacturer'},
+                    'model': {'$first': '$model'},
+                    'capacity': {'$first': '$capacity'},
+                    'trips_number': {'$sum': 1},
+                    'avg_trip_time': {'$avg': '$trip_time'},
+                    'avg_passengers': {'$avg': '$passengers'}
+                }
+            },
+            # sort results by number od trips (decreasing)
+            {
+                '$sort': {
+                    'trips_number': DESCENDING
+                }
+            }
+        ])
+        '''print('\n\nresults x6:')
+        for result in results:
+            print(result)
+        print('\n\n')'''
+
+        print('results', results)

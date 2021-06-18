@@ -86,16 +86,5 @@ def mongo_report():
     return {'report_results': results}
 
 
-@app.route('/', methods=['GET'])
-def home():
-    return {'message': "You are now on the home page"}
-
-
-@app.route('/mongo', methods=['GET'])
-def mongo():
-    orders = mng_help.mongo_test()
-    return {'orders': orders}
-
-
 if __name__ == '__main__':
     app.run()

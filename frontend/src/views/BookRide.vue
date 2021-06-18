@@ -1,8 +1,7 @@
 <template>
     <div class="book-ride-menu">
         <b-container fluid>
-            <p>database: {{ database }}</p>
-            <label class="input-header">Please fill in the fields to book a ride:</label>
+            <h5 class="input-header">Please fill in the fields to book a ride:</h5>
             <b-row class="input">
                 <b-col sm="3">
                     <label>email:</label>
@@ -105,4 +104,9 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style scoped>
+p {
+    padding-right: 220px;
+    margin-top: 50px;
+}
+</style>

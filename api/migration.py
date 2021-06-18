@@ -90,6 +90,7 @@ class MigrationHelper:
                 'trip_time': result[7],
                 'price': result[8]
             }
+            print('result["end_time"]', result['end_time'])
             hist_orders_with_keys.append(result)
 
         return hist_orders_with_keys
