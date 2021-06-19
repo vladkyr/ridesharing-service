@@ -13,7 +13,7 @@ CREATE TABLE models (
 );
 
 CREATE TABLE vehicles (
-  vehicle_id int unsigned not null auto_increment primary key,int
+  vehicle_id int unsigned not null auto_increment primary key,
   model_id int unsigned not null,
   status varchar(20),
   number_plate varchar(20) not null,
