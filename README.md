@@ -11,7 +11,7 @@ docker compose up --build
 ```
 4. navigate to:
 ```
-localhost:8001
+localhost:8001 or https://localhost
 ```
 5. To stop the running containers press "CTRL-C" and run:
 ```
